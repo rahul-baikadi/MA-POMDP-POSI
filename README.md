@@ -1,2 +1,2 @@
 # MA-POMDP-POSI
-Trying different algorithms for 'Multi Agent - Partially Observable Markov Decision Process with Partial Online State Information' setting.
+Trying different algorithms for '**M**ulti **A**gent - **P**artially **O**bservable **M**arkov **D**ecision **P**rocess with **P**artial **O**nline **S**tate **I**nformation' setting.
