@@ -26,6 +26,7 @@ import numpy as np
 from dataclasses import dataclass, field
 from typing import Tuple, Dict, List
 import math
+from datetime import datetime
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -477,8 +478,8 @@ def plot_per_agent_regret(results_dict: dict, save_path: str, title: str):
 
 def main():
     # ---- Configurable parameters ----
-    d = 15; S_tilde = 2; A = 4; H = 4; d_tilde = 5; K = 3000
-    N_values = [2, 4, 8]
+    d = 40; S_tilde = 7; A = 4; H = 5; d_tilde = 5; K = 7500
+    N_values = [4, 8, 12]
 
     print("=" * 65)
     print("MA-PDOL-Sharing — Per-Agent Regret for Different Settings")
@@ -525,7 +526,7 @@ def main():
     # ---- Plot ----
     plot_per_agent_regret(
         results,
-        '/mnt/user-data/outputs/MA-PDOL-Sharing_regret.png',
+        f'MA-PDOL_sharing_regret_{datetime.now().strftime("%m%d_%H%M")}.png',
         f'MA-PDOL-Sharing — Per-Agent Regret vs Episode\n'
         f'(d={d}, d̃={d_tilde}, |S̃|={S_tilde}, A={A}, H={H})')
 
