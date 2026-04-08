@@ -1,15 +1,15 @@
 """
-MISC + Shared UCB: Multi-Agent PDOL with Shared Transition Counts
+MA-PDOL-Sharing: Multi-Agent PDOL with Shared Transition Counts
 ==================================================================
 
-This is the MISC algorithm (MISC_Algorithm.pdf) with ONE modification:
+This is the MA-PDOL algorithm with ONE modification:
 all N agents share a SINGLE UCB-VI transition model instead of private ones.
 
-Difference from misc_algorithm.py:
-  - Original MISC: each agent n has private counts N^n_h,i(x,a)
-  - Shared UCB:    all agents write/read from shared counts N_h,i(x,a)
+Difference from MA-PDOL.py:
+  - Original MA-PDOL: each agent n has private counts N^n_h,i(x,a)
+  - MA-PDOL-Sharing:    all agents write/read from shared counts N_h,i(x,a)
 
-Everything else (Eq. 1-24) is identical to the proposed MISC algorithm.
+Everything else (Eq. 1-24) is identical to MA-PDOL.
 
 This is valid because all agents interact with independent copies of
 the SAME POMDP, so every agent's transition observation is an i.i.d.
@@ -19,7 +19,7 @@ Effect: per-agent UCB counts grow N times faster, so bonuses shrink
 by ~1/sqrt(N), giving per-agent action-learning regret O(1/sqrt(N)).
 
 Usage:
-    python misc_shared_ucb.py
+    python MA-PDOL-Sharing.py
 """
 
 import numpy as np
@@ -38,14 +38,14 @@ def safe_exp(x: float, cap: float = 500.0) -> float:
 
 
 ###########################################################################
-# Subclass 2 POSI-POMDP Environment (identical to misc_algorithm.py)
+# Subclass 2 POSI-POMDP Environment (identical to MA-PDOL.py)
 ###########################################################################
 
 @dataclass
 class POSIPOMDPSubclass2:
     """
     Episodic POSI-POMDP under Subclass 2 dynamics.
-    See misc_algorithm.py for full documentation.
+    See MA-PDOL.py for full documentation.
     """
     d: int
     S_tilde_size: int
@@ -105,7 +105,7 @@ class POSIPOMDPSubclass2:
 
 
 ###########################################################################
-# UCB-VI (identical to misc_algorithm.py)
+# UCB-VI (identical to MA-PDOL.py)
 ###########################################################################
 
 class CoordinateUCBVI:
@@ -144,7 +144,7 @@ class CoordinateUCBVI:
 
 
 ###########################################################################
-# Agent State (identical to misc_algorithm.py)
+# Agent State (identical to MA-PDOL.py)
 ###########################################################################
 
 @dataclass
@@ -160,10 +160,10 @@ class AgentState:
 
 
 ###########################################################################
-# MISC + Shared UCB Algorithm
+# MA-PDOL-Sharing Algorithm
 ###########################################################################
 
-class MISCSharedUCB:
+class MAPDOLSharing:
     
 
     def __init__(self, env: POSIPOMDPSubclass2, N: int, d_tilde: int,
@@ -215,7 +215,7 @@ class MISCSharedUCB:
                            else [], dtype=int)
             self.agents.append(AgentState(n, S_n, set()))
 
-    # ----- All helper methods identical to MISC -----
+    # ----- All helper methods identical to MA-PDOL -----
 
     def _global_distribution(self) -> np.ndarray:
         """Eq. (5)"""
@@ -287,7 +287,7 @@ class MISCSharedUCB:
 
     def run(self, verbose: bool = False) -> dict:
         """
-        Run the MISC + Shared UCB algorithm.
+        Run the MA-PDOL-Sharing algorithm.
 
         The ONLY runtime difference: when agent n calls
             self.ucb[n].update(h, i, x, a, x')
@@ -481,7 +481,7 @@ def main():
     N_values = [2, 4, 8]
 
     print("=" * 65)
-    print("MISC + Shared UCB — Per-Agent Regret for Different Settings")
+    print("MA-PDOL-Sharing — Per-Agent Regret for Different Settings")
     print("=" * 65)
     print(f"Environment: d={d}, |S~|={S_tilde}, A={A}, H={H}")
     print(f"Algorithm:   d~={d_tilde}, K={K}")
@@ -497,8 +497,8 @@ def main():
     for N_ in N_values:
         np.random.seed(0)
         env = base_env.clone()
-        algo = MISCSharedUCB(env=env, N=N_, d_tilde=d_tilde, K=K)
-        label = f"Shared UCB N={N_}"
+        algo = MAPDOLSharing(env=env, N=N_, d_tilde=d_tilde, K=K)
+        label = f"MA-PDOL-Sharing N={N_}"
         print(f"\nRunning {label} (eta2={algo.eta2:.3f}, "
               f"epoch_len={algo.epoch_len}) ...")
         t0 = time.time()
@@ -525,8 +525,8 @@ def main():
     # ---- Plot ----
     plot_per_agent_regret(
         results,
-        '/mnt/user-data/outputs/misc_shared_ucb_regret.png',
-        f'MISC + Shared UCB — Per-Agent Regret vs Episode\n'
+        '/mnt/user-data/outputs/MA-PDOL-Sharing_regret.png',
+        f'MA-PDOL-Sharing — Per-Agent Regret vs Episode\n'
         f'(d={d}, d̃={d_tilde}, |S̃|={S_tilde}, A={A}, H={H})')
 
 

@@ -1,8 +1,8 @@
 """
-MISC: Multi-Agent PDOL-Style Querying with Epoch-End Recommendation
+MA-PDOL: Multi-Agent PDOL-Style Querying with Epoch-End Recommendation
 ====================================================================
 
-Implements the algorithm from MISC_Algorithm.pdf for N agents interacting
+Implements the MA-PDOL algorithm for N agents interacting
 with independent copies of the same POSI-POMDP environment under Subclass 2
 dynamics (Near_Optimal_PORL, Section V).
 
@@ -16,7 +16,7 @@ Subclass 2 conditions:
 Each agent maintains its OWN private UCB-VI transition model.
 
 Usage:
-    python misc_algorithm.py
+    python MA-PDOL.py
 """
 
 import numpy as np
@@ -175,7 +175,7 @@ class CoordinateUCBVI:
 
 @dataclass
 class AgentState:
-    """Per-agent state for the MISC algorithm."""
+    """Per-agent state for the MA-PDOL algorithm."""
     agent_id: int
     base_set: np.ndarray         # S_n -- Eq. (2)
     recommended: set             # R^e_n -- Eq. (3)/(23)
@@ -187,15 +187,15 @@ class AgentState:
 
 
 ###########################################################################
-# MISC Algorithm
+# MA-PDOL Algorithm
 ###########################################################################
 
-class MISCAlgorithm:
+class MAPDOLAlgorithm:
     """
     Multi-Agent PDOL-Style Querying with Epoch-End Recommendation.
 
     Each agent maintains a PRIVATE UCB-VI module (no transition count sharing).
-    All equations reference MISC_Algorithm.pdf.
+    All equations reference the MA-PDOL algorithm.
     """
 
     def __init__(self, env: POSIPOMDPSubclass2, N: int, d_tilde: int,
@@ -327,7 +327,7 @@ class MISCAlgorithm:
 
     def run(self, verbose: bool = False) -> dict:
         """
-        Run the full MISC algorithm.
+        Run the full MA-PDOL algorithm.
 
         Returns dict with keys:
             'rewards'            : {agent_id: [episode rewards]}
@@ -529,7 +529,7 @@ def main():
     N_values = [4, 8, 12]
 
     print("=" * 65)
-    print("MISC Algorithm — Per-Agent Regret for Different Settings")
+    print("MA-PDOL Algorithm — Per-Agent Regret for Different Settings")
     print("=" * 65)
     print(f"Environment: d={d}, |S~|={S_tilde}, A={A}, H={H}")
     print(f"Algorithm:   d~={d_tilde}, K={K}")
@@ -545,8 +545,8 @@ def main():
     for N_ in N_values:
         np.random.seed(0)
         env = base_env.clone()
-        algo = MISCAlgorithm(env=env, N=N_, d_tilde=d_tilde, K=K)
-        label = f"MISC N={N_}"
+        algo = MAPDOLAlgorithm(env=env, N=N_, d_tilde=d_tilde, K=K)
+        label = f"MA-PDOL N={N_}"
         print(f"\nRunning {label} (eta2={algo.eta2:.3f}, "
               f"epoch_len={algo.epoch_len}) ...")
         t0 = time.time()
@@ -573,8 +573,8 @@ def main():
     # ---- Plot ----
     plot_per_agent_regret(
         results,
-        f'misc_regret_{datetime.now().strftime("%Y%m%d_%H%M")}.png',
-        f'MISC — Per-Agent Regret vs Episode\n'
+        f'MA-PDOL_regret_{datetime.now().strftime("%Y%m%d_%H%M")}.png',
+        f'MA-PDOL — Per-Agent Regret vs Episode\n'
         f'(d={d}, d̃={d_tilde}, |S̃|={S_tilde}, A={A}, H={H})')
 
 
