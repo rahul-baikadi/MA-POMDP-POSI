@@ -228,8 +228,9 @@ class MAPDOLAlgorithm:
         # Learning rates -- Eq. (6), (7)
         self.eta1 = min(1.0, 1.0 / math.sqrt(K))
         eff_size = math.ceil(self.d / N) + (N - 1)
+        c=0.8
         self.eta2 = min(
-            16 * eff_size / max(1, d_tilde - 1) * self.eta1,
+            c * eff_size / max(1, d_tilde - 1) * self.eta1,
             d_tilde / max(1, self.H),
             1.0
         )
@@ -525,7 +526,7 @@ def plot_per_agent_regret(results_dict: dict, save_path: str, title: str):
 
 def main():
     # ---- Configurable parameters ----
-    d = 40; S_tilde = 6; A = 4; H = 5; d_tilde = 5; K = 7000
+    d = 40; S_tilde = 6; A = 4; H = 5; d_tilde = 5; K = 10000
     N_values = [4, 8, 12]
 
     print("=" * 65)

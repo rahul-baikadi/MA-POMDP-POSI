@@ -188,12 +188,11 @@ class MAPDOLSharing:
 
         # Learning rates -- Eq. (6), (7)
         self.eta1 = min(1.0, 1.0 / math.sqrt(K))
+        C = 16  # instead of 16
         eff_size = math.ceil(self.d / N) + (N - 1)
-        self.eta2 = min(
-            16 * eff_size / max(1, d_tilde - 1) * self.eta1,
-            d_tilde / max(1, self.H),
-            1.0
-        )
+        self.eta2 = min(C * eff_size / max(1, d_tilde - 1) * self.eta1,
+                d_tilde / max(1, self.H), 1.0)
+        
 
         # Gamma -- Eq. (20)
         self.Gamma = math.ceil(self.d / N) + N - 2
@@ -442,7 +441,7 @@ def plot_per_agent_regret(results_dict: dict, save_path: str, title: str):
     """
     fig, ax = plt.subplots(figsize=(10, 6))
     colors = ['#e6194b', '#3cb44b', '#4363d8', '#f58231',
-              '#911eb4', '#42d4f4', '#f032e6', '#bfef45']
+              '#911eb4', "#249cb7a6", '#f032e6', '#bfef45']
     K_max = 0
     for idx, (label, res) in enumerate(results_dict.items()):
         Na = len(res['rewards'])
