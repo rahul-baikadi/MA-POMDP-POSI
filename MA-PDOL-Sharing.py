@@ -169,8 +169,17 @@ class MAPDOLSharing:
 
     def __init__(self, env: POSIPOMDPSubclass2, N: int, d_tilde: int,
                  K: int, delta: float = 0.05):
-        assert 2 <= d_tilde <= env.d - 1
-        assert N >= 1 and K >= 1
+        assert N >= 1 and K >= 1                                    
+        max_dt = env.d // N - 1                                     
+        assert max_dt >= 2, (                                       
+            f"Cannot satisfy partial observability: d/N - 1 = "     
+            f"{max_dt} < 2. Increase d or decrease N "              
+            f"(need d >= 3*N, got d={env.d}, N={N}).")
+        if d_tilde > max_dt:                                        
+            print(f"  [Auto-adjust] d_tilde={d_tilde} exceeds "     
+                  f"d/N-1={max_dt}. Setting d_tilde={max_dt} "      
+                  f"to enforce d_tilde*N < d.")
+            d_tilde = max_dt                                        
 
         self.env = env
         self.N = N
@@ -188,7 +197,7 @@ class MAPDOLSharing:
 
         # Learning rates -- Eq. (6), (7)
         self.eta1 = min(1.0, 1.0 / math.sqrt(K))
-        C = 16  # instead of 16
+        C = 4  # instead of 16
         eff_size = math.ceil(self.d / N) + (N - 1)
         self.eta2 = min(C * eff_size / max(1, d_tilde - 1) * self.eta1,
                 d_tilde / max(1, self.H), 1.0)
@@ -477,8 +486,8 @@ def plot_per_agent_regret(results_dict: dict, save_path: str, title: str):
 
 def main():
     # ---- Configurable parameters ----
-    d = 40; S_tilde = 7; A = 4; H = 5; d_tilde = 5; K = 7500
-    N_values = [4, 8, 12]
+    d = 40; S_tilde = 6; A = 4; H = 10; d_tilde = 3; K = 10000
+    N_values = [4, 8, 10]
 
     print("=" * 65)
     print("MA-PDOL-Sharing — Per-Agent Regret for Different Settings")
