@@ -192,12 +192,12 @@ class MAPDOLSharing:
         self.delta = delta
 
         # Epoch length -- Eq. (1)
-        self.epoch_len = max(1, int(np.ceil(
+        self.epoch_len = max(1, int(3*np.ceil(
             self.d / (N * d_tilde) + (N - 1) / d_tilde)))
 
         # Learning rates -- Eq. (6), (7)
         self.eta1 = min(1.0, 1.0 / math.sqrt(K))
-        C = 4  # instead of 16
+        C = 2  # instead of 16
         eff_size = math.ceil(self.d / N) + (N - 1)
         self.eta2 = min(C * eff_size / max(1, d_tilde - 1) * self.eta1,
                 d_tilde / max(1, self.H), 1.0)
@@ -486,8 +486,8 @@ def plot_per_agent_regret(results_dict: dict, save_path: str, title: str):
 
 def main():
     # ---- Configurable parameters ----
-    d = 40; S_tilde = 6; A = 4; H = 10; d_tilde = 3; K = 10000
-    N_values = [4, 8, 10]
+    d = 40; S_tilde = 6; A = 4; H = 7; d_tilde = 4; K = 20000
+    N_values = [5,8]
 
     print("=" * 65)
     print("MA-PDOL-Sharing — Per-Agent Regret for Different Settings")

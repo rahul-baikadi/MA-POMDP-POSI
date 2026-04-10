@@ -231,8 +231,8 @@ class MAPDOLAlgorithm:
         self.delta = delta
 
         # Epoch length -- Eq. (1)
-        self.epoch_len = max(1, int(np.ceil(
-            self.d / (N * d_tilde) + (N - 1) / d_tilde)))
+        self.epoch_len = max(1, int(np.ceil(3*(
+            self.d / (N * d_tilde) + (N - 1) / d_tilde))))
 
         # Learning rates -- Eq. (6), (7)
         self.eta1 = min(1.0, 1.0 / math.sqrt(K))
@@ -535,7 +535,7 @@ def plot_per_agent_regret(results_dict: dict, save_path: str, title: str):
 
 def main():
     # ---- Configurable parameters ----
-    d = 40; S_tilde = 6; A = 4; H = 12; d_tilde = 3; K = 10000
+    d = 40; S_tilde = 5; A = 4; H = 7; d_tilde = 4; K = 15000
     N_values = [5, 10]
 
     print("=" * 65)
