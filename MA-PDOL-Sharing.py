@@ -487,7 +487,7 @@ def plot_per_agent_regret(results_dict: dict, save_path: str, title: str):
 def main():
     # ---- Configurable parameters ----
     d = 40; S_tilde = 6; A = 4; H = 10; d_tilde = 3; K = 10000
-    N_values = [4, 8, 10]
+    N_values = [5, 10]
 
     print("=" * 65)
     print("MA-PDOL-Sharing — Per-Agent Regret for Different Settings")

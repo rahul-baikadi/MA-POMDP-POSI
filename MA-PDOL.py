@@ -455,21 +455,42 @@ class MAPDOLAlgorithm:
                         self.global_weights[i] * safe_exp(exponent),
                         1e-300, 1e300)
 
-            # --- Epoch-end recommendation -- Eq. (22)-(23) ---
+            # --- Epoch-end recommendation -- Modified Eq. (22)-(23) ---
+            # Instead of raw baseline-subtracted episode gains, recommend
+            # based on estimated long-horizon optimal value V_hat^{*,i}
+            # computed from the agent's learned empirical transition model.
             recs = {}
             for n in range(self.N):
-                coord_totals = {}
-                for ed in epoch_data[n]:
-                    for i, v in ed.items():
-                        if i != self.agents[n].leader:
-                            coord_totals[i] = coord_totals.get(i, 0.0) + v
-                if coord_totals:
-                    recs[n] = max(coord_totals, key=coord_totals.get)
+                ag = self.agents[n]
+                non_leader_coords = [int(i) for i in ag.augmented_set
+                                     if int(i) != ag.leader]
+                if not non_leader_coords:
+                    continue
 
-            # Eq. (23)-(24)
-            for n in range(self.N):
-                self.agents[n].recommended = {
-                    recs[m] for m in recs if m != n}
+                # Compute estimated V^{*,i} for each non-leader coord
+                # using empirical transitions (NO bonus — plug-in estimate)
+                best_val = -np.inf
+                best_coord = non_leader_coords[0]
+                for ci in non_leader_coords:
+                    V_hat = np.zeros((self.H + 1, self.St))
+                    for h in range(self.H - 1, -1, -1):
+                        for x in range(self.St):
+                            for a in range(self.A):
+                                cnt = self.ucb[n].counts[h, ci, x, a]
+                                if cnt > 0:
+                                    p_hat = (self.ucb[n].counts_next[h, ci, x, a]
+                                            / cnt)
+                                else:
+                                    p_hat = np.ones(self.St) / self.St
+                                q_val = self.env.r[h, x, a] + p_hat @ V_hat[h + 1]
+                                if a == 0 or q_val > V_hat[h, x]:
+                                    V_hat[h, x] = q_val
+                    # Average over initial state distribution
+                    val_i = self.env.delta1[ci] @ V_hat[0]
+                    if val_i > best_val:
+                        best_val = val_i
+                        best_coord = ci
+                recs[n] = best_coord
 
         return {
             'rewards': all_rewards,
