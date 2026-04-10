@@ -208,8 +208,17 @@ class MAPDOLAlgorithm:
             K       : total number of episodes per agent
             delta   : confidence parameter for UCB-VI
         """
-        assert 2 <= d_tilde <= env.d - 1, f"Need 2 <= d_tilde <= d-1"
-        assert N >= 1 and K >= 1
+        assert N >= 1 and K >= 1                                    
+        max_dt = env.d // N - 1                                     
+        assert max_dt >= 2, (                                       
+            f"Cannot satisfy partial observability: d/N - 1 = "     
+            f"{max_dt} < 2. Increase d or decrease N "              
+            f"(need d >= 3*N, got d={env.d}, N={N}).")
+        if d_tilde > max_dt:                                        
+            print(f"  [Auto-adjust] d_tilde={d_tilde} exceeds "     
+                  f"d/N-1={max_dt}. Setting d_tilde={max_dt} "      
+                  f"to enforce d_tilde*N < d.")
+            d_tilde = max_dt                                        
 
         self.env = env
         self.N = N
